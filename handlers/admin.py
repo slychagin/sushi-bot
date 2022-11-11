@@ -3,6 +3,8 @@ from create_bot import bot
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from keyboards import admin_keyboard
+from data_base import sqlite_db
 
 ID = None
 
@@ -18,7 +20,11 @@ async def make_changes_command(message: types.Message):
     """Check is user admin. If admin then allow changes."""
     global ID
     ID = message.from_user.id
-    await bot.send_message(message.from_user.id, 'Что, руководитель, надо?')
+    await bot.send_message(
+        message.from_user.id,
+        'Что, руководитель, надо?',
+        reply_markup=admin_keyboard.admin_kb
+    )
     await message.delete()
 
 
@@ -67,13 +73,12 @@ async def load_description(message: types.Message, state: FSMContext):
 
 
 async def load_price(message: types.Message, state: FSMContext):
-    """Get forth answer and save price to dictionary"""
+    """Get forth answer, save price to dictionary and save all data to database"""
     if message.from_user.id == ID:
         async with state.proxy() as data:
             data['price'] = float(message.text.replace(',', '.'))
 
-        async with state.proxy() as data:
-            await message.reply(str(data))
+        await sqlite_db.db_add_command(state)
 
         await state.finish()
 

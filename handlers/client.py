@@ -1,6 +1,7 @@
 from aiogram import types, Dispatcher
 from create_bot import bot
 from keyboards import keyboard_client
+from data_base import sqlite_db
 from aiogram.types import ReplyKeyboardRemove
 
 
@@ -24,13 +25,13 @@ async def sushi_address_command(message: types.Message):
     await bot.send_message(message.from_user.id, 'г. Ростов-на-Дону, ул. Комарова, 28', reply_markup=ReplyKeyboardRemove())
 
 
-# @dp.message_handler(commands=['Меню'])
-# async def sushi_menu_command(message: types.Message):
-#     for ret in cur.execute('SELECT * FROM menu').fetchall():
-#         await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание: {ret[2]}\nЦена: {ret[-1]}')
+async def sushi_menu_command(message: types.Message):
+    await sqlite_db.db_read(message)
+
 
 def register_handlers_client(dp: Dispatcher):
     """Register all client handlers"""
     dp.register_message_handler(start_command, commands=['start', 'help'])
     dp.register_message_handler(sushi_open_command, commands=['Режим_работы'])
     dp.register_message_handler(sushi_address_command,  commands=['Адрес'])
+    dp.register_message_handler(sushi_menu_command, commands=['Меню'])
