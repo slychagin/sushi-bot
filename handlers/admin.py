@@ -78,7 +78,7 @@ async def load_price(message: types.Message, state: FSMContext):
     """Get forth answer, save price to dictionary and save all data to database"""
     if message.from_user.id == ID:
         async with state.proxy() as data:
-            data['price'] = float(message.text.replace(',', '.'))
+            data['price'] = int(message.text)
 
         await sqlite_db.db_add_command(state)
         await state.finish()
