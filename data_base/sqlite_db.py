@@ -14,6 +14,7 @@ def connect_db():
 
 
 async def db_add_command(state):
+    """Add sushi to db"""
     async with state.proxy() as data:
         cur.execute('INSERT INTO menu VALUES (?, ?, ?, ?)', tuple(data.values()))
         db.commit()
@@ -28,3 +29,14 @@ async def db_read(message):
             f'Описание: {row[2]}\n'
             f'Цена: {row[-1]}'
         )
+
+
+async def db_delete_command(data):
+    """Delete item from db"""
+    cur.execute('DELETE FROM menu WHERE name == ?', (data,))
+    db.commit()
+
+
+async def db_read_all():
+    """Read all from db"""
+    return cur.execute('SELECT * FROM menu').fetchall()

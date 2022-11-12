@@ -5,11 +5,13 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from keyboards import admin_keyboard
 from data_base import sqlite_db
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 ID = None
 
 
 class FSMAdmin(StatesGroup):
+    """Finite state machine. Writing all states."""
     photo = State()
     name = State()
     description = State()
@@ -79,8 +81,37 @@ async def load_price(message: types.Message, state: FSMContext):
             data['price'] = float(message.text.replace(',', '.'))
 
         await sqlite_db.db_add_command(state)
-
         await state.finish()
+
+
+async def call_back_run(callback_query: types.CallbackQuery):
+    await sqlite_db.db_delete_command(callback_query.data.replace('del ', ''))
+    await callback_query.answer(
+        text=f'{callback_query.data.replace("del ", "")} удалена.',
+        show_alert=True
+    )
+
+
+async def delete_item(message: types.Message):
+    """Read all data from db, create Delete button"""
+    if message.from_user.id == ID:
+        read_data = await sqlite_db.db_read_all()
+        for row in read_data:
+            await bot.send_photo(
+                message.from_user.id,
+                row[0],
+                f'{row[1]}\n'
+                f'Описание: {row[2]}\n'
+                f'Цена: {row[-1]}'
+            )
+            await bot.send_message(
+                message.from_user.id,
+                text='^^^',
+                reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton(
+                    f'Удалить {row[1]}',
+                    callback_data=f'del {row[1]}'
+                ))
+            )
 
 
 def register_handlers_admin(dp: Dispatcher):
@@ -93,3 +124,5 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_price, state=FSMAdmin.price)
     dp.register_message_handler(cancel_handler, state='*', commands='отмена')
+    dp.register_message_handler(delete_item, commands=['Удалить'])
+    dp.register_callback_query_handler(call_back_run, lambda x: x.data and x.data.startswith('del '))
