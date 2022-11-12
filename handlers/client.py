@@ -22,7 +22,7 @@ async def sushi_open_command(message: types.Message):
 
 async def sushi_address_command(message: types.Message):
     """Send message with sushi-bar address"""
-    await bot.send_message(message.from_user.id, 'г. Ростов-на-Дону, ул. Комарова, 28', reply_markup=ReplyKeyboardRemove())
+    await bot.send_message(message.from_user.id, 'г. Ростов-на-Дону, ул. Комарова, 28')
 
 
 async def sushi_menu_command(message: types.Message):
