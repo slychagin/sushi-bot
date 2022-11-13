@@ -1,4 +1,5 @@
 # sushi-bot
+Ссылка на бот: https://t.me/Sushi_ProfiBot
 ### Telegram бот для суши бара.
 
 Простой телеграм бот для суши бара.
@@ -23,3 +24,6 @@
 - подключите бота в Telegram и получите токен;
 - в файле `create_bot.py` подставьте свой токен;
 - запустите файл `telegram_bot.py`
+
+### Попробовать онлайн:
+https://t.me/Sushi_ProfiBot
